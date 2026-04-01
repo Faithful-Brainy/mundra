@@ -1,7 +1,30 @@
 import prisma from "@/lib/prisma-client";
-import { Role, User } from "@prisma/client";
+import { User } from "@prisma/client";
 import { NextResponse } from "next/server";
 import  jwt  from "jsonwebtoken";
+
+enum Role {
+  PARENT,
+  SENMAST,
+  NURCOR,
+  ASSNURCOR,
+  HEAD,
+  ASSHEAD,
+  STUDENT,
+  TEACHER,
+  PRINCIPAL,
+  REG,
+  DIRECTOR,
+  ASSDIC,
+  BURSAR,
+  MANAGER,
+  VP,
+  GIUDE,
+  LIB,
+  ICT,
+  PROP,
+  DEV,
+}
 
 type UserPayload = {
     id?: string,
@@ -44,7 +67,7 @@ export async function POST(req: Request) {
     const email = (payload.email ?? prevUser?.email ?? currentUser.email)?.trim();
     const name = (payload.name ?? prevUser?.name ?? currentUser.name ?? "").trim();
     const password = (payload.password ?? prevUser?.password ?? currentUser.password)?.trim();
-    const role = (payload.role ?? prevUser?.role ?? currentUser.role);
+    const role: Role = (payload.role! ?? prevUser?.role ?? currentUser.role);
 
     try{
         if (wardId) {
