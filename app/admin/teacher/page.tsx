@@ -112,7 +112,7 @@ export default async function TeacherAdminPage() {
                   No teacher accounts exist in the database yet.
                 </div>
               ) : (
-                teachers.map((teacher) => (
+                teachers.map((teacher: any) => (
                   <Link
                     key={teacher.id}
                     href={`/admin/teacher/${teacher.id}`}
