@@ -97,7 +97,7 @@ export async function POST(req: Request) {
                 name,
                 email,
                 password,
-                role,
+                role: role ?? Role.PARENT,
             },
             include: {
                 wards: true

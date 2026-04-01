@@ -60,12 +60,16 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "User with this email already exists" }, { status: 409 });
     }
 
+    if (!role) {
+      throw new Error("Role is required");
+    }
+
     const newUser = await prisma.user.create({
       data: {
         name: name || email.split("@")[0] || "Unnamed",
         email,
         password,
-        role,
+        role: role ?? Role.PARENT,
       },
       select: {
         id: true,
