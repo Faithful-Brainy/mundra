@@ -1,0 +1,30 @@
+maths
+english
+chem
+living habit
+drawing
+social
+td
+ict
+comp
+b.sc
+phy bio chem
+religion
+lit-in-eng`
+commerce
+accounting
+PHE
+Reading
+rhymes
+coloring
+-------------------------
+const cookieStore = await cookies();
+  const token = cookieStore.get("token")?.value;
+  try {
+    const user = jwt.verify(token, process.env.JWT_SECRET!);
+    setUserId(user.id);
+  } catch {
+    console.error("OOPS");
+  }
+
+  -u

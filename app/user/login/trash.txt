@@ -1,0 +1,145 @@
+var i = 0;
+              const use = users.find(user => user.email === email.toString().trimEnd() )
+              setUs(use);
+
+----------------------------------------
+
+console.log(users[0]);
+              console.log(us);
+              if ( password == us?.password?.trimEnd() ) {
+                setUserPath(`/user/${us.id}`)
+                setLoading(false)
+                console.log("SSSSUUUUCCEESS!!")
+                setError("")
+              } else {
+                setError("Wrong password");
+                setUserPath("")
+                setLoading(true)
+              }
+
+<button disabled={loading}><Link className="w-full max-w-[281px] rounded-3xl bg-black px-4 py-2 text-center text-white disabled:cursor-not-allowed disabled:opacity-70" href={userPath}>Go!</Link></button>
+        
+
+type PublicUser = { id: string; name: string; email: string; password: string; wards: Ward[] | null };
+
+    const [users, setUsers] = useState<PublicUser[]>([]);
+
+useEffect(() => {
+        fetch("/api/auth/users")
+        .then((res) => (res.ok ? res.json() : null))
+        .then((data: { users?: PublicUser[] } | null) => {
+        if (data?.users) {
+          setUsers(data.users);
+        }
+        })
+      .catch(() => {});
+    }, [])
+
+
+var users: PublicUser[];
+
+    const res = await fetch(`${process.env.BASE_URL}/api/auth/users`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+
+    const data = await res.json().catch((e) => console.error(e));
+
+    users = data.users ?? undefined
+
+    const id: string = params.id
+    let user = users.find(us => us.id == id)
+
+    async function updateUserProperty(e: React.SubmitEvent) {
+      const email = e.target.children[1].nodeValue
+      const password = e.target.children[2].nodeValue
+      const name = e.target.children[0].nodeValue
+
+      const res = await fetch(`${process.env.BASE_URL}/app/api/controllers/updateUser`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id, email, password, name, user })
+      });
+
+      const data = await res.json();
+
+      user = data as PublicUser
+    }
+
+----------------------------------------------
+type Subject{
+  maths....
+}
+
+program "JSS2"
+
+------------------------------------
+<div className="space-y-3">
+              <h4 className="font-semibold text-gray-700">Recent Achievements:</h4>
+              <div className="flex flex-wrap gap-2">
+                {ward.achievements.map((item, index) => (
+                  <span key={index} className="bg-gray-100 text-gray-600 px-3 py-1 rounded-lg text-sm">
+                    🏆 {item}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+
+
+
+
+const levelOf = {
+    "1": "Play Class",
+    "2": "Nursery",
+    "3": "Primary",
+    "4": "Special Class",
+    "5": "JSS",
+    "6": "SSS",
+}
+
+const levelSecondOf = {
+    "1": "1",
+    "2": "2",
+    "3": "3",
+    "4": "4",
+    "5": "5",
+    "6": "6,"
+}
+
+const alpha = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m"];
+const num = [...Array(alpha.length)].map((_, i) => i + 1);
+
+const classOf = Object.fromEntries(num.map((num, i) => [num, alpha[i]]));
+
+
+-------------
+
+<img
+                                src={teacher.info.imageUrl}
+                                alt={teacher.info.name ?? "Teacher profile"}
+                                className="h-20 w-20 rounded-full border border-[#38bdf8]/35 object-cover"
+                            />
+                            <div>
+                                <h2 className="font-[Poppins,Montserrat,sans-serif] text-2xl font-semibold text-[#e0f2fe]">
+                                    {teacher.info.name}
+                                </h2>
+                                <p className="mt-1 text-sm text-[#7dd3fc]">{teacher.info.email}</p>
+                                <p className="mt-2 text-sm text-[#bfdbfe]">{teacher.info.bio}</p>
+
+                                <img
+                                src={teacher.info.imageUrl}
+                                alt={teacher.info.name ?? "Teacher profile"}
+                                className="h-20 w-20 rounded-full border border-[#38bdf8]/35 object-cover"
+                            />
+                            <div>
+                                <h2 className="font-[Poppins,Montserrat,sans-serif] text-2xl font-semibold text-[#e0f2fe]">
+                                    {teacher.info.name}
+                                </h2>
+                                <p className="mt-1 text-sm text-[#7dd3fc]">{teacher.info.email}</p>
+                                <p className="mt-2 text-sm text-[#bfdbfe]">{teacher.info.bio}</p>
+                            </div>

@@ -1,0 +1,152 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+enum Gender {
+  BOY
+  GIRL
+  UNID
+  TRANS
+}
+
+enum Rel {
+  GUARDIAN
+  KIN
+  PARENT
+  ADOPTIVE
+}
+
+enum Role {
+  PARENT
+  SENMAST
+  NURCOR
+  ASSNURCOR
+  HEAD
+  ASSHEAD
+  STUDENT
+  TEACHER
+  PRINCIPAL
+  REG
+  DIRECTOR
+  ASSDIC
+  BURSAR
+  MANAGER
+  VP
+  GIUDE
+  LIB
+  ICT
+  PROP
+  DEV
+}
+
+enum Category {
+  ART
+  SCIENCE
+  COMMERCIAL
+  SOCIAL
+  GENERAL
+}
+
+enum NewsType {
+  ANNOUNCEMENT
+  NEWS
+  NEWSLETTER
+  URGENT
+  EVENT
+}
+
+enum NewsTarget {
+  PARENT
+  STUDENT
+  STAFF
+  GENERAL
+  MANAGEMENT
+}
+
+model User {
+  id          String  @id @default(cuid())
+  name        String? @default("Unnamed")
+  email       String  @unique
+  password    String
+  imageUrl    String  @default("/cookie.png")
+  bio         String?  @default("Hi, Im A Mundra E-User")
+  role        Role    @default(PARENT)
+  wards       Ward[]
+  phone       String?
+}
+
+model Ward {
+  id       String  @id @default(cuid())
+  name     String  @default("unnamed")
+  passKey  String
+  isActive Boolean @default(false)
+  classId  Int     @default(000)
+  class    Class   @relation(fields: [classId], references: [id])
+  userId   String
+  imageUrl String  @default("/chat.png")
+  bio      String  @default("Hi, Im A Mundra E-Student")
+  user     User    @relation(fields: [userId], references: [id])
+  ser      Int?
+  subjects Subjects[]
+}
+
+model Teacher {
+  id         String @id @default(cuid())
+  userId     String @unique
+  queryCount String
+  classes    Class[]
+  subjects   String
+  isMaster   Boolean
+  ofClass    String
+  subjName   String
+  subject    Subjects @relation(fields: [subjName], references: [name])
+}
+
+model Class {
+  id       Int       @id @default(autoincrement())
+  name     String
+  level    Int   
+  subClass String   
+  teachers Teacher[]
+  master   String
+  wards    Ward[]
+}
+
+model Subjects {
+  id       Int      @id @default(autoincrement())
+  name     String   @unique
+  wardId   String
+  ca1      Int
+  ca2      Int
+  ca3      Int
+  exam     Int      
+  ward     Ward     @relation(fields: [wardId], references: [id])
+  category Category @default(GENERAL)
+  teachers Teacher[]
+}
+
+model NewsItem {
+  id    Int       @id @default(autoincrement())
+  title String
+  desc  String
+  date  String
+  type  NewsType  @default(NEWS)
+  for   Role
+}
+
+model Admission {
+  id       String     @id @default(uuid())
+  userId   String
+  name     String
+  classId  String
+  dob      DateTime?
+  gend     Gender?
+  state    String?
+  rel      Rel?
+  parName  String?
+  prevSch  String?
+}

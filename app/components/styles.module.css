@@ -1,0 +1,10 @@
+.header {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease;
+}
+
+.area:hover .header {
+  opacity: 1;
+  visibility: visible;
+}
