@@ -1,6 +1,29 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma-client";
-import { Role } from "@prisma/client";
+
+enum Role {
+  PARENT,
+  SENMAST,
+  NURCOR,
+  ASSNURCOR,
+  HEAD,
+  ASSHEAD,
+  STUDENT,
+  TEACHER,
+  PRINCIPAL,
+  REG,
+  DIRECTOR,
+  ASSDIC,
+  BURSAR,
+  MANAGER,
+  VP,
+  GIUDE,
+  LIB,
+  ICT,
+  PROP,
+  DEV,
+}
+
 
 type SignupPayload = {
   email?: string;
@@ -21,7 +44,7 @@ export async function POST(req: Request) {
   const email = (payload.email ?? "").trim().toLowerCase();
   const password = (payload.password ?? "").trim();
   const name = (payload.name ?? "").trim();
-  const role = (payload.role);
+  const role: Role = (payload.role!);
 
   if (!email || !password) {
     return NextResponse.json({ error: "Email and password are required" }, { status: 400 });
