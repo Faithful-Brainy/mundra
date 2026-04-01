@@ -1,5 +1,5 @@
 import prisma from "@/lib/prisma-client";
-import { User } from "@prisma/client";
+import type { User } from "@prisma/client";
 import { NextResponse } from "next/server";
 import  jwt  from "jsonwebtoken";
 
