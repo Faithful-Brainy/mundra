@@ -1,5 +1,4 @@
 import prisma from "@/lib/prisma-client";
-import { Admission } from "@prisma/client";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
@@ -39,7 +38,7 @@ export default async function RegistrarPage() {
               No admission requests found yet.
             </div>
           ) : (
-            admissions.map((admission: Admission) => (
+            admissions.map((admission: any) => (
               <article
                 key={admission.id}
                 className="mx-auto w-full max-w-6xl overflow-hidden rounded-[2.5rem] border border-gray-100 bg-white text-[#0f172a] shadow-2xl transition-transform duration-300 hover:-translate-y-2"
