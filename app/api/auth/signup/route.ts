@@ -1,36 +1,23 @@
 import { NextResponse } from "next/server";
+import { Role } from "@prisma/client";
 import prisma from "@/lib/prisma-client";
-
-enum Role {
-  PARENT,
-  SENMAST,
-  NURCOR,
-  ASSNURCOR,
-  HEAD,
-  ASSHEAD,
-  STUDENT,
-  TEACHER,
-  PRINCIPAL,
-  REG,
-  DIRECTOR,
-  ASSDIC,
-  BURSAR,
-  MANAGER,
-  VP,
-  GIUDE,
-  LIB,
-  ICT,
-  PROP,
-  DEV,
-}
-
 
 type SignupPayload = {
   email?: string;
   password?: string;
   name?: string;
-  role?: Role;
+  role?: string;
 };
+
+const validRoles = new Set(Object.values(Role));
+
+function normalizeRole(role?: string): Role {
+  if (role && validRoles.has(role as Role)) {
+    return role as Role;
+  }
+
+  return Role.PARENT;
+}
 
 export async function POST(req: Request) {
   let payload: SignupPayload = {};
@@ -44,7 +31,7 @@ export async function POST(req: Request) {
   const email = (payload.email ?? "").trim().toLowerCase();
   const password = (payload.password ?? "").trim();
   const name = (payload.name ?? "").trim();
-  const role: Role = (payload.role!);
+  const role = normalizeRole(payload.role);
 
   if (!email || !password) {
     return NextResponse.json({ error: "Email and password are required" }, { status: 400 });
@@ -60,16 +47,12 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "User with this email already exists" }, { status: 409 });
     }
 
-    if (!role) {
-      throw new Error("Role is required");
-    }
-
     const newUser = await prisma.user.create({
       data: {
         name: name || email.split("@")[0] || "Unnamed",
         email,
         password,
-        role: role ?? Role.PARENT,
+        role: role,
       },
       select: {
         id: true,
