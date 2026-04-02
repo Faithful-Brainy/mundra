@@ -16,7 +16,7 @@ const relOptions = [
 
 export default function AdmissionForm() {
   const [name, setName] = useState("");
-  const [classId, setClassId] = useState(0);
+  const [classId, setClassId] = useState(1);
   const [parentAccount, setParentAccount] = useState("");
   const [state, setState] = useState("");
   const [success, setSuccess] = useState(false);
