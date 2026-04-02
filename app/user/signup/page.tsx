@@ -48,7 +48,7 @@ export default function SignUp() {
       const data = (await res.json().catch(() => ({}))) as { error?: string };
 
       if (!res.ok) {
-        setError(data.error || "Signup failed");
+        setError(data.error!);
         return;
       }
 
