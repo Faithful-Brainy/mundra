@@ -20,6 +20,7 @@ export default function AdmissionForm() {
   const [parentAccount, setParentAccount] = useState("");
   const [state, setState] = useState("");
   const [success, setSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     async function loadCurrentUser() {
@@ -37,6 +38,7 @@ export default function AdmissionForm() {
   }, []);
 
   async function handleSubmit(e: React.SubmitEvent) {
+    setLoading(true);
     e.preventDefault()
 
     const res = await fetch("/api/auth/makeAdmit", {
@@ -44,10 +46,11 @@ export default function AdmissionForm() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ classId, name }),
+      body: JSON.stringify({ classId: classId.toString(), name }),
     });
 
-    if (res.ok) setSuccess(true);
+    if (res.ok) {setSuccess(true); setLoading(true);}
+    else {setLoading(false); setSuccess(false);}
   }
 
   return (
@@ -163,8 +166,9 @@ export default function AdmissionForm() {
                 <button
                   type="submit"
                   className="inline-flex items-center justify-center rounded-full border border-[#0f2242] bg-[#0f2242] px-6 py-3 text-sm font-semibold text-white shadow-[0_6px_18px_rgba(15,34,66,0.28)] transition-all hover:-translate-y-0.5 hover:bg-[#1e3c72] active:translate-y-0"
+                  disabled={loading}
                 >
-                  Submit Admission Form
+                  { loading ? <p>Submitting....</p> : <p>Submit Form</p> }
                 </button>
 
                 <Link
