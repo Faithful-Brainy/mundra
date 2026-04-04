@@ -1,4 +1,5 @@
 import prisma from "@/lib/prisma-client";
+import { Mail } from "@/lib/email";
 import { cookies } from "next/headers";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { NextResponse } from "next/server";
@@ -110,6 +111,19 @@ export async function POST(req: Request) {
     });
 
     if (ward) {
+        const message: string = `
+        <h1>Yor Ward Is Officially Registered</h1>
+        <h2>Thank You For Registering With Mundra Model Schools</h2>
+        <h3>${ward.name}'s info is shown below</h3>
+        <ul>
+          <li>ID: ${ward.id}</li> 
+          <li>Name: ${ward.name}</li> 
+          <li>ClassID: ${ward.classId}</li> 
+          <li>PassKey: ${ward.passKey}</li>
+        </ul>
+        <h1><b>Note, DO NOT SHARE ANY INFO SHOWN HERE WITH ANYONE</b></h1> 
+        `;
+        await Mail(ward.user.email,"Ward Registration Information", message )
         return NextResponse.json({ ward })
     } else {
         return NextResponse.json({error: "Failed To Create Ward"}, {status: 400})
