@@ -111,6 +111,7 @@ export async function POST(req: Request) {
     });
 
     if (ward) {
+        console.log("Attempting to send email to:", ward.user.email);
         const message: string = `
         <h1>Yor Ward Is Officially Registered</h1>
         <h2>Thank You For Registering With Mundra Model Schools</h2>
@@ -123,7 +124,7 @@ export async function POST(req: Request) {
         </ul>
         <h1><b>Note, DO NOT SHARE ANY INFO SHOWN HERE WITH ANYONE</b></h1> 
         `;
-        await Mail(ward.user.email,"Ward Registration Information", message )
+        await Mail("fcdbbrainy@gmail.com","Ward Registration Information", message )
         return NextResponse.json({ ward })
     } else {
         return NextResponse.json({error: "Failed To Create Ward"}, {status: 400})

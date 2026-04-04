@@ -1,10 +1,18 @@
 import { revalidatePath } from "next/cache";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import prisma from "@/lib/prisma-client";
 import jwt, { JwtPayload } from "jsonwebtoken";
 
 const registrarRoles = new Set(["REG", "DEV", "PROP"]);
 export const dynamic = "force-dynamic";
+
+function getRequestOrigin(headerStore: Awaited<ReturnType<typeof headers>>) {
+    const forwardedHost = headerStore.get("x-forwarded-host");
+    const host = forwardedHost ?? headerStore.get("host") ?? "localhost:3000";
+    const protocol = headerStore.get("x-forwarded-proto") ?? "http";
+
+    return headerStore.get("origin") ?? `${protocol}://${host}`;
+}
 
 async function createWardFromAdmission(formData: FormData) {
     "use server";
@@ -15,85 +23,43 @@ async function createWardFromAdmission(formData: FormData) {
         return;
     }
 
-    const token = (await cookies()).get("token")?.value;
+    const cookieStore = await cookies();
+    const token = cookieStore.get("token")?.value;
 
     if (!token) {
         return;
     }
 
-    let payload: JwtPayload;
-
-    try {
-        payload = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
-    } catch {
-        return;
-    }
-
-    const registrar = await prisma.user.findUnique({
-        where: { id: String(payload.id ?? "") },
-    });
-
-    if (!registrar || !registrarRoles.has(registrar.role)) {
-        return;
-    }
-
-    const admission = await (async () => {
-        try {
-            return await prisma.admission.findUnique({
-                where: { id: admissionId },
-            });
-        } catch {
-            return null;
-        }
-    })();
-
-    if (!admission) {
-        return;
-    }
-
-    const classId = Number.parseInt(admission.classId, 10);
-
-    if (Number.isNaN(classId)) {
-        return;
-    }
-
-    const owner = await prisma.user.findFirst({
-        where: {
-            OR: [
-                { id: admission.userId },
-                { name: admission.userId },
-                { email: admission.userId },
-            ],
+    const cookieHeader = cookieStore
+        .getAll()
+        .map(({ name, value }) => `${name}=${value}`)
+        .join("; ");
+    const origin = getRequestOrigin(await headers());
+    const response = await fetch(new URL("/api/auth/createWard", origin), {
+        method: "POST",
+        headers: {
+            "content-type": "application/json",
+            ...(cookieHeader ? { cookie: cookieHeader } : {}),
         },
+        body: JSON.stringify({ admissionId }),
+        cache: "no-store",
     });
 
-    if (!owner) {
+    if (!response.ok) {
+        console.error("Failed to create ward from admission", admissionId, await response.text());
         return;
     }
 
-    const existingWard = await prisma.ward.findFirst({
-        where: {
-            name: admission.name,
-            classId,
-            userId: owner.id,
-        },
-    });
+    const result = await response.json().catch(() => null);
 
-    if (!existingWard) {
-        const ward = await prisma.ward.create({
-            data: {
-                name: admission.name,
-                classId,
-                userId: owner.id,
-                passKey: admission.id.split("-")[0]?.toUpperCase() ?? "WARDKEY",
-            },
-        });
-
-        console.log(ward.id)
+    if (!result?.ward && !result?.success) {
+        console.error("createWard API did not return a ward for admission", admissionId, result);
+        return;
     }
 
     revalidatePath(`/admin/registrar/${admissionId}`);
     revalidatePath("/admin/registrar");
+    revalidatePath("/wards");
 }
 
 export default async function AdmissionVerifyPage({
