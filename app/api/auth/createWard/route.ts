@@ -111,6 +111,9 @@ export async function POST(req: Request) {
     });
 
     if (ward) {
+        await prisma.admission.delete({
+            where: {id: admissionId}
+        })
         console.log("Attempting to send email to:", ward.user.email);
         const message: string = `
         <h1>Yor Ward Is Officially Registered</h1>
