@@ -3,6 +3,7 @@ import UserForm from "../components/UserForm";
 import WardForm from "../components/WardForm";
 import LogoutButton from "../components/LogoutButton";
 import Link from "next/link";
+import UserLoadError from "../components/UserLoadError"
 import Image from "next/image";
 
 export default async function ProfilePage({
@@ -10,6 +11,7 @@ export default async function ProfilePage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+
   const { id } = await params;
 
   const user = await prisma.user.findUnique({
@@ -18,7 +20,7 @@ export default async function ProfilePage({
   });
 
   if (!user) {
-    return <div>User not loaded.</div>;
+    return(<UserLoadError />);
   }
 
   return (
