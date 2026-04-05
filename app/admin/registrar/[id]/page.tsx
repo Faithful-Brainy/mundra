@@ -61,7 +61,7 @@ async function createWardFromAdmission(formData: FormData) {
     revalidatePath("/admin/registrar");
     revalidatePath("/wards");
 
-    window.location.replace("/admin/registrar");
+    window.location.replace("/app/admin/registrar");
 }
 
 export default async function AdmissionVerifyPage({
