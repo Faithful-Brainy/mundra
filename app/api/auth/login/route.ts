@@ -19,7 +19,7 @@ export async function POST(req: Request) {
   }
 
   const identifier = (payload.email ?? "").trim();
-  const password = await bcrypt.hash(payload.password!.trim(), 10);
+  const password = (payload.password ?? "").trim();
 
   if (!identifier || !password) {
     return NextResponse.json({ error: "Username/email and password are required" }, { status: 400 });
