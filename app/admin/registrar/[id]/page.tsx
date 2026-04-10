@@ -2,6 +2,7 @@ import { revalidatePath } from "next/cache";
 import { cookies, headers } from "next/headers";
 import prisma from "@/lib/prisma-client";
 import jwt, { JwtPayload } from "jsonwebtoken";
+import { redirect } from "next/navigation";
 
 const registrarRoles = new Set(["REG", "DEV", "PROP"]);
 export const dynamic = "force-dynamic";
@@ -61,7 +62,7 @@ async function createWardFromAdmission(formData: FormData) {
     revalidatePath("/admin/registrar");
     revalidatePath("/wards");
 
-    window.location.replace("/app/admin/registrar");
+    redirect("/app/admin/registrar");
 }
 
 export default async function AdmissionVerifyPage({

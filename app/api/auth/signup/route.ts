@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { Role } from "@prisma/client";
 import prisma from "@/lib/prisma-client";
+import bcrypt from "bcrypt";
 
 type SignupPayload = {
   email?: string;
@@ -29,7 +30,7 @@ export async function POST(req: Request) {
   }
 
   const email = (payload.email ?? "").trim().toLowerCase();
-  const password = (payload.password ?? "").trim();
+  const password = await bcrypt.hash(payload.password!.trim(), 10)
   const name = (payload.name ?? "").trim();
   const role = normalizeRole(payload.role);
 

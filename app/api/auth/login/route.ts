@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
 
 import prisma from "@/lib/prisma-client";
 
@@ -18,7 +19,7 @@ export async function POST(req: Request) {
   }
 
   const identifier = (payload.email ?? "").trim();
-  const password = (payload.password ?? "").trim();
+  const password = await bcrypt.hash(payload.password!.trim(), 10);
 
   if (!identifier || !password) {
     return NextResponse.json({ error: "Username/email and password are required" }, { status: 400 });
@@ -35,7 +36,7 @@ export async function POST(req: Request) {
       }
     });
 
-    if (!user) {
+    if (!user || !bcrypt.compare(password, user?.password)) {
       return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
     }
 
@@ -45,7 +46,7 @@ export async function POST(req: Request) {
         email: user.email,
         name: user.name,
         wards: user.wards,
-        password: user.password,
+        password: bcrypt.hash(user.password, 10),
         role: user.role
       },
       process.env.JWT_SECRET!,
