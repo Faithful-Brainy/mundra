@@ -28,7 +28,6 @@ export async function POST(req: Request) {
   try {
     const user = await prisma.user.findFirst({
       where: {
-        password,
         OR: [{ name: identifier }, { email: identifier }],
       },
       include: {
@@ -36,7 +35,7 @@ export async function POST(req: Request) {
       }
     });
 
-    if (!user || !bcrypt.compare(password, user?.password)) {
+    if (!user || !(await bcrypt.compare(password, user?.password))) {
       return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
     }
 
@@ -46,7 +45,6 @@ export async function POST(req: Request) {
         email: user.email,
         name: user.name,
         wards: user.wards,
-        password: bcrypt.hash(user.password, 10),
         role: user.role
       },
       process.env.JWT_SECRET!,
