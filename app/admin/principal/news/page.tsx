@@ -48,6 +48,8 @@ export default function NewsPage() {
   const [type, setType] = useState<(typeof newsTypeOptions)[number]["value"]>("NEWS");
   const [forRole, setForRole] = useState<(typeof roleOptions)[number]>("PARENT");
   const [success, setSuccess] = useState(false);
+  const [pending, setPending] = useState(false);
+  const [error, setError] = useState();
 
   let previewDate = "Select a publication date";
 
@@ -63,9 +65,28 @@ export default function NewsPage() {
         }).format(parsedDate);
   }
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: React.SubmitEvent) {
     e.preventDefault();
-    setSuccess(true);
+    setPending(true);
+
+    const res = await fetch("/api/admin/createNewsItem", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({title, desc, date, type, for: forRole})
+    })
+
+    const data = await res.json()
+
+    if (!res.ok) {
+      setError(data?.error);
+      setSuccess(false);
+    } else {
+      setSuccess(true);
+    }
+
+    setPending(false);
   }
 
   return (
@@ -80,8 +101,6 @@ export default function NewsPage() {
               News Publication Form
             </h1>
             <p className="mt-3 max-w-2xl text-base text-[#1e3c72] md:text-lg">
-              Draft a news item using the same fields required by the `NewsItem`
-              schema model.
             </p>
           </div>
 
@@ -90,8 +109,7 @@ export default function NewsPage() {
               Form Guide
             </p>
             <p className="mt-3 text-sm leading-6 text-[#0f2242]">
-              This page is frontend-only for now, so submitting will validate the
-              form and keep a local preview without making backend enquiries.
+              This page is used for the uploading of news and letters or memos acroos the website, for now this is only accessible ny the principal.
             </p>
           </div>
         </header>
@@ -169,10 +187,9 @@ export default function NewsPage() {
               </label>
 
               <div className="rounded-2xl border border-[#1e3c72]/20 bg-[#eaf8ff] p-4 text-sm text-[#0f2242]">
-                <p className="font-semibold">Schema fields covered</p>
+                <p className="font-semibold">Please Fill In This Form Fully</p>
                 <p className="mt-2 leading-6 text-[#1e3c72]">
-                  `title`, `desc`, `date`, `type`, and `for` are all required in
-                  this form to match the `NewsItem` model.
+                  Fill in all required information on the news form.
                 </p>
               </div>
 
@@ -232,8 +249,9 @@ export default function NewsPage() {
                   <button
                     type="submit"
                     className="inline-flex items-center justify-center rounded-full border border-[#0f2242] bg-[#0f2242] px-6 py-3 text-sm font-semibold text-white shadow-[0_6px_18px_rgba(15,34,66,0.28)] transition-all hover:-translate-y-0.5 hover:bg-[#1e3c72] active:translate-y-0"
+                    disabled={pending}
                   >
-                    Save News Draft
+                    { !pending ? "Save News Draft" : "Saving....." }
                   </button>
 
                   <Link
@@ -250,8 +268,12 @@ export default function NewsPage() {
 
         {success && (
           <p className="mt-6 rounded-2xl border border-[#14532d]/20 bg-[#dcfce7] px-4 py-3 text-sm font-medium text-[#14532d]">
-            News draft captured successfully. No backend request was made.
+            News draft captured successfully
           </p>
+        )}
+
+        {error && (
+          <p className="mt-6 rounded-2xl border border-[#14532d]/20 bg-[#dcfce7] px-4 py-3 text-sm font-medium text-[#ffffff]"> News Draft Capture Failed</p>
         )}
       </section>
     </main>
