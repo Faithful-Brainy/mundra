@@ -1,24 +1,8 @@
-export default function News() {
-  const newsItems = [
-    {
-      date: "September 15, 2025",
-      title: "New Academic Session Begins",
-      category: "Academics",
-      body: "We warmly welcome all students and parents to the new academic session. Orientation for new students starts next week.",
-    },
-    {
-      date: "September 30, 2025",
-      title: "Inter-House Sports Festival",
-      category: "Events",
-      body: "Students across all houses will compete in track, football, and relay events. Parents are invited to attend and support.",
-    },
-    {
-      date: "October 10, 2025",
-      title: "Parent-Teacher Conference Week",
-      category: "Parents",
-      body: "Book one-on-one meetings with class teachers to review student progress and discuss goals for the term.",
-    },
-  ];
+import prisma from "@/lib/prisma-client";
+import Link from "next/link";
+
+export default async function News() {
+  const newsItems = await prisma.newsItem.findMany();
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-[#1e3c72] via-[#2a5298] to-[#1e3c72] px-4 pb-12 pt-24 md:px-10 md:pt-28">
@@ -41,14 +25,14 @@ export default function News() {
             >
               <div className="mb-3 flex items-center justify-between gap-2">
                 <span className="rounded-full bg-[#dce8ff] px-3 py-1 text-xs font-semibold uppercase tracking-wide text-[#0f2242]">
-                  {item.category}
+                  {item.for}
                 </span>
                 <time className="text-sm font-medium text-[#1e3c72]/90">
                   {item.date}
                 </time>
               </div>
-              <h2 className="text-xl font-bold text-[#0f2242]">{item.title}</h2>
-              <p className="mt-3 text-sm leading-6 text-[#1e3c72]/90">{item.body}</p>
+              <Link href={`./news/${item.id}`}><h2 className="text-xl font-bold text-[#0f2242]">{item.title}</h2></Link>
+              <p className="mt-3 text-sm leading-6 text-[#1e3c72]/90">{item.desc}</p>
             </article>
           ))}
         </div>
