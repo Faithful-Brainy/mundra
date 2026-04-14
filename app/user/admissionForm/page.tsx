@@ -3,6 +3,13 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+type Subject = {
+  name?: string,
+  classlimitl?: number,
+  classlimith?: number,
+  categ?: "SCIENCE" | "ART" | "GENERAL",
+}
+
 const inputClassName =
   "mt-2 w-full rounded-2xl border border-[#1e3c72]/30 bg-[#eaf8ff] px-4 py-3 text-sm text-[#0b1324] placeholder:text-[#1e3c72]/70 focus:border-[#0f2242] focus:outline-none";
 
@@ -13,6 +20,13 @@ const relOptions = [
     { value: "KIN", label: "Relative" }
 ];
 
+const subjects: Subject[] = [
+  {name: "MATHS", classlimitl: 0, classlimith: 100, categ: "GENERAL"},
+  {name: "ENG", classlimitl: 0, classlimith: 100, categ: "GENERAL"},
+  {name: "CIVIC", classlimitl: 0, classlimith: 100, categ: "GENERAL"},
+  {name: "ICT", classlimitl: 34, classlimith: 100, categ: "GENERAL"},
+  {name: "PHY", classlimitl: 34, classlimith: 100, categ: "SCIENCE"}
+] 
 
 export default function AdmissionForm() {
   const [name, setName] = useState("");
@@ -21,6 +35,7 @@ export default function AdmissionForm() {
   const [state, setState] = useState("");
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [subjects, setSubjects] = useState<Subject[]>()
 
   useEffect(() => {
     async function loadCurrentUser() {
@@ -117,6 +132,11 @@ export default function AdmissionForm() {
               <label className="text-sm font-medium text-[#0f2242]">
                 State of Origin
                 <input type="text" placeholder="Enter state of origin" className={inputClassName} value={state} onChange={(e) => setState(e.target.value)}/>
+              </label>
+
+              <label className="text-sm font-medium text-[#0f2242]">
+                Subjects
+                <input type="text" placeholder="Enter previous school" className={inputClassName} />
               </label>
             </div>
           </section>

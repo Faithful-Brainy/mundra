@@ -13,6 +13,25 @@ enum Gender {
   TRANS
 }
 
+enum Subjects {
+  MATH
+  ENG
+  FURMATH
+  GEO
+  CIVIC
+  ECONS
+  TD
+  PHY
+  BIO
+  CHEM
+  REL
+  COMP
+  ICT
+  LIT
+  COMM
+  HOME
+}
+
 enum Rel {
   GUARDIAN
   KIN
@@ -91,7 +110,8 @@ model Ward {
   bio      String  @default("Hi, Im A Mundra E-Student")
   user     User    @relation(fields: [userId], references: [id])
   ser      Int?
-  subjects Subjects[]
+  subjects Subject[]
+  sheet    ScoreSheet[]
 }
 
 model Teacher {
@@ -100,10 +120,18 @@ model Teacher {
   queryCount String
   classes    Class[]
   subjects   String
-  isMaster   Boolean
-  ofClass    String
-  subjName   String
-  subject    Subjects @relation(fields: [subjName], references: [name])
+}
+
+model ScoreSheet {
+  id       String   @id @default(uuid())
+  wardId   String   @unique
+  subjects Subjects 
+  ca1      Int[]     
+  ca2      Int[]     
+  ca3      Int[]     
+  pracEx   Int[]     
+  exam     Int[]     
+  ward     Ward     @relation(fields: [wardId], references: [id])
 }
 
 model Class {
@@ -116,17 +144,17 @@ model Class {
   wards    Ward[]
 }
 
-model Subjects {
+model Subject {
   id       Int      @id @default(autoincrement())
-  name     String   @unique
+  name     Subjects
   wardId   String
-  ca1      Int
-  ca2      Int
-  ca3      Int
-  exam     Int      
+  ca1      Int      @default(0)
+  ca2      Int      @default(0)
+  ca3      Int      @default(0)
+  exam     Int      @default(0)
   ward     Ward     @relation(fields: [wardId], references: [id])
   category Category @default(GENERAL)
-  teachers Teacher[]
+  teacherId String  @default("cmm")
 }
 
 model NewsItem {
