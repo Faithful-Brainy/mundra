@@ -8,17 +8,7 @@ const roleOptions = [
     { value: "PARENT", label: "Parent" },
     { value: "STUDENT", label: "Student" },
     { value: "TEACHER", label: "Teacher" },
-    { value: "PRINCIPAL", label: "Principal" },
-    { value: "DIRECTOR", label: "Director" },
-    { value: "BURSAR", label: "Bursar" },
-    { value: "MANAGER", label: "Manager" },
-    { value: "VP", label: "Vice Principal" },
-    { value: "GIUDE", label: "Guidance Counselor" },
-    { value: "LIB", label: "Librarian" },
     { value: "ICT", label: "ICT Officer" },
-    { value: "PROP", label: "Proprietor" },
-    { value: "DEV", label: "Dev" },
-    { value: "REG", label: "Registrar" },
   ];
 
 export default function SignUp() {

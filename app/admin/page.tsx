@@ -30,7 +30,7 @@ const staffPanels = [
   { roleKey: "ICT", slug: "ict-officer", role: "ICT Officer", count: "3", summary: "Lab systems, network access, and device support.", action: "IT Dashboard" },
   { roleKey: "DEV", slug: "admin-controls", role: "Administrator In Dev Mode", count: "1", summary: "Welcome To Dev Panel.", action: "Open Admin Controls" },
   { roleKey: "PROP", slug: "proprietor", role: "Proprietor", count: "1", summary: "Full oversight across academic, operations, and finance.", action: "Open Admin Controls" },
-  { roleKey: "REG", slug: "registrar", role: "Registratin Manager", count: "1", summary: "Registry of New Students", action: "Open Panel" },
+  { roleKey: "REG", slug: "registrar", role: "Registration Manager", count: "1", summary: "Registry of New Students", action: "Open Panel" },
 ]
 
 const actionButtons = [

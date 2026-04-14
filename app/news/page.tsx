@@ -19,6 +19,14 @@ export default async function News() {
           </p>
         </div>
 
+        <div>
+          {newsItems.length === 0 && (
+            <span><h3> Currently No Updates </h3>
+            <h5>There are as of currently no updates from the school management, Please Come Again Later, to be updated on the happenings in Mundra</h5></span>
+            
+          )}
+        </div>
+
         <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
           {newsItems.map((item) => (
             <article
