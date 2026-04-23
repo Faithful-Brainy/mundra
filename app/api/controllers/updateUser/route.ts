@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma-client";
 import { Role, type User } from "@prisma/client";
+import bcrypt from "bcrypt";
 import { NextResponse } from "next/server";
 import  jwt  from "jsonwebtoken";
 
@@ -53,7 +54,8 @@ export async function POST(req: Request) {
 
     const email = (payload.email ?? prevUser?.email ?? currentUser.email)?.trim();
     const name = (payload.name ?? prevUser?.name ?? currentUser.name ?? "").trim();
-    const password = (payload.password ?? prevUser?.password ?? currentUser.password)?.trim();
+    const temp = (payload.password ?? prevUser?.password ?? currentUser.password)?.trim();
+    const password = await bcrypt.hash(temp, 10)
     const role = normalizeRole(payload.role, prevUser?.role ?? currentUser.role);
 
     try{

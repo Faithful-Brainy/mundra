@@ -1,14 +1,9 @@
 "use client";
 
+import { UserScalarFieldEnum } from "@/app/generated/prisma/internal/prismaNamespace";
+import { encodeAdmissionSubjectId, formatSubjectName } from "@/lib/admission-subject";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-
-type Subject = {
-  name?: string,
-  classlimitl?: number,
-  classlimith?: number,
-  categ?: "SCIENCE" | "ART" | "GENERAL",
-}
 
 const inputClassName =
   "mt-2 w-full rounded-2xl border border-[#1e3c72]/30 bg-[#eaf8ff] px-4 py-3 text-sm text-[#0b1324] placeholder:text-[#1e3c72]/70 focus:border-[#0f2242] focus:outline-none";
@@ -20,22 +15,20 @@ const relOptions = [
     { value: "KIN", label: "Relative" }
 ];
 
-const subjects: Subject[] = [
-  {name: "MATHS", classlimitl: 0, classlimith: 100, categ: "GENERAL"},
-  {name: "ENG", classlimitl: 0, classlimith: 100, categ: "GENERAL"},
-  {name: "CIVIC", classlimitl: 0, classlimith: 100, categ: "GENERAL"},
-  {name: "ICT", classlimitl: 34, classlimith: 100, categ: "GENERAL"},
-  {name: "PHY", classlimitl: 34, classlimith: 100, categ: "SCIENCE"}
-] 
-
 export default function AdmissionForm() {
+  type SubjectOption = {
+    id: number;
+    name: string;
+  };
+
   const [name, setName] = useState("");
-  const [classId, setClassId] = useState(1);
+  const [classId, setClassId] = useState("");
   const [parentAccount, setParentAccount] = useState("");
+  const [userId, setUserId] = useState("");
   const [state, setState] = useState("");
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [subjects, setSubjects] = useState<Subject[]>()
+  const [classes, setClasses] = useState<SubjectOption[]>([]);
 
   useEffect(() => {
     async function loadCurrentUser() {
@@ -47,24 +40,50 @@ export default function AdmissionForm() {
       }
 
       setParentAccount(data.user.name ?? data.user.email ?? "");
+      setUserId(data.user.id);
+    }
+
+    async function loadSubjects() {
+      const res = await fetch("/api/getAllFromTable", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ tableName: "ClassAdmit" }),
+      });
+
+      const data = await res.json().catch(() => []);
+
+      if (!res.ok || !Array.isArray(data)) {
+        return;
+      }
+
+      setClasses(data);
     }
 
     loadCurrentUser();
+    loadSubjects();
   }, []);
 
   async function handleSubmit(e: React.SubmitEvent) {
-    setLoading(true);
     e.preventDefault()
+    setLoading(true);
+    setSuccess(false);
+
+    if (!classId) {
+      setLoading(false);
+      return;
+    }
 
     const res = await fetch("/api/auth/makeAdmit", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ classId: classId.toString(), name }),
+      body: JSON.stringify({ name, classId, userId }),
     });
 
-    if (res.ok) {setSuccess(true); setLoading(true);}
+    if (res.ok) {setSuccess(true); setLoading(false);}
     else {setLoading(false); setSuccess(false);}
   }
 
@@ -104,8 +123,22 @@ export default function AdmissionForm() {
               </label>
 
               <label className="text-sm font-medium text-[#0f2242]">
-                Class ID
-                <input type="number" placeholder="Enter class ID" className={inputClassName} value={classId} onChange={(e) => setClassId(e.target.value as unknown as number)} />
+                Class
+                <select
+                  className={inputClassName}
+                  value={classId}
+                  onChange={(e) => setClassId(e.target.value)}
+                  required
+                >
+                  <option value="" disabled>
+                    {classes.length > 0 ? "Select a Class" : "Classes Load Failed"}
+                  </option>
+                  {classes.map((classOp) => (
+                    <option key={classOp.id} value={classOp.id.toString()}>
+                      {classOp.name}
+                    </option>
+                  ))}
+                </select>
               </label>
 
               <label className="text-sm font-medium text-[#0f2242]">
@@ -134,10 +167,6 @@ export default function AdmissionForm() {
                 <input type="text" placeholder="Enter state of origin" className={inputClassName} value={state} onChange={(e) => setState(e.target.value)}/>
               </label>
 
-              <label className="text-sm font-medium text-[#0f2242]">
-                Subjects
-                <input type="text" placeholder="Enter previous school" className={inputClassName} />
-              </label>
             </div>
           </section>
 

@@ -13,6 +13,21 @@ enum Gender {
   TRANS
 }
 
+enum ClassEither {
+  A
+  B
+  C
+  D
+  E
+  F
+  G
+  H
+  I
+  J
+  K
+  L
+}
+
 enum Subjects {
   MATH
   ENG
@@ -119,7 +134,7 @@ model Teacher {
   userId     String @unique
   queryCount String
   classes    Class[]
-  subjects   String
+  subjects   Subject[]
 }
 
 model ScoreSheet {
@@ -134,27 +149,36 @@ model ScoreSheet {
   ward     Ward     @relation(fields: [wardId], references: [id])
 }
 
+model ClassAdmit  {
+  id       Int       @id @default(autoincrement())
+  name     String
+  level    Int
+  subLevel Int
+}
+
+
 model Class {
   id       Int       @id @default(autoincrement())
   name     String
-  level    Int   
-  subClass String   
+  level    Int
+  subLevel Int  
+  division String
   teachers Teacher[]
-  master   String
+  master   String?
   wards    Ward[]
 }
+
 
 model Subject {
   id       Int      @id @default(autoincrement())
   name     Subjects
-  wardId   String
   ca1      Int      @default(0)
   ca2      Int      @default(0)
   ca3      Int      @default(0)
   exam     Int      @default(0)
-  ward     Ward     @relation(fields: [wardId], references: [id])
+  ward     Ward[]
   category Category @default(GENERAL)
-  teacherId String  @default("cmm")
+  teachers Teacher[]
 }
 
 model NewsItem {

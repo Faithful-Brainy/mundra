@@ -1,4 +1,10 @@
 import { revalidatePath } from "next/cache";
+import {
+    decodeAdmissionAssignedClassId,
+    decodeAdmissionSubjectId,
+    encodeAdmissionSelection,
+    formatSubjectName,
+} from "@/lib/admission-subject";
 import { cookies, headers } from "next/headers";
 import prisma from "@/lib/prisma-client";
 import jwt, { JwtPayload } from "jsonwebtoken";
@@ -62,7 +68,51 @@ async function createWardFromAdmission(formData: FormData) {
     revalidatePath("/admin/registrar");
     revalidatePath("/wards");
 
-    redirect("/app/admin/registrar");
+    redirect("/admin/registrar");
+}
+
+async function assignClassToAdmission(formData: FormData) {
+    "use server";
+
+    const admissionId = String(formData.get("admissionId") ?? "").trim();
+    const subjectId = Number.parseInt(String(formData.get("subjectId") ?? ""), 10);
+    const classId = Number.parseInt(String(formData.get("classId") ?? ""), 10);
+
+    if (!admissionId || Number.isNaN(subjectId) || Number.isNaN(classId)) {
+        return;
+    }
+
+    const token = (await cookies()).get("token")?.value;
+
+    if (!token) {
+        return;
+    }
+
+    let payload: JwtPayload;
+
+    try {
+        payload = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
+    } catch {
+        return;
+    }
+
+    const registrar = await prisma.user.findUnique({
+        where: { id: String(payload.id ?? "") },
+    });
+
+    if (!registrar || !registrarRoles.has(registrar.role)) {
+        return;
+    }
+
+    await prisma.admission.update({
+        where: { id: admissionId },
+        data: {
+            classId: encodeAdmissionSelection(subjectId, classId),
+        },
+    });
+
+    revalidatePath(`/admin/registrar/${admissionId}`);
+    revalidatePath("/admin/registrar");
 }
 
 export default async function AdmissionVerifyPage({
@@ -105,7 +155,47 @@ export default async function AdmissionVerifyPage({
 
     if (!admission) return(<div>Admission Unloaded</div>)
 
-    const classId = Number.parseInt(admission.classId, 10);
+    const [subjects, classes] = await Promise.all([
+      prisma.subject.findMany({
+        select: {
+          id: true,
+          name: true,
+        },
+      }).catch(() => []),
+      prisma.class.findMany({
+        select: {
+          id: true,
+          name: true,
+          level: true,
+          subLevel: true,
+        },
+        orderBy: [
+          { level: "asc" },
+          { subLevel: "asc" },
+          { name: "asc" },
+        ],
+      }).catch(() => []),
+    ]);
+    const subjectLabels = new Map(
+      subjects.map((subject) => [subject.id, formatSubjectName(subject.name)]),
+    );
+    const classLabels = new Map(
+      classes.map((classItem) => [
+        classItem.id,
+        [classItem.name, `Level ${classItem.level}`, `Section ${classItem.subLevel}`]
+          .filter(Boolean)
+          .join(" • "),
+      ]),
+    );
+    const selectedSubjectId = decodeAdmissionSubjectId(admission.classId);
+    const selectedSubject = selectedSubjectId === null
+      ? null
+      : (subjectLabels.get(selectedSubjectId) ?? `Subject #${selectedSubjectId}`);
+    const assignedClassId = decodeAdmissionAssignedClassId(admission.classId);
+    const assignedClass = assignedClassId === null
+      ? null
+      : (classLabels.get(assignedClassId) ?? `Class #${assignedClassId}`);
+    const classId = assignedClassId ?? Number.parseInt(admission.classId, 10);
     const owner = await prisma.user.findFirst({
       where: {
         OR: [
@@ -144,8 +234,13 @@ export default async function AdmissionVerifyPage({
                         Request #{admission.id}
                       </p>
                       <p className="mt-2 text-sm text-[#bfdbfe]">
-                        Class ID: {admission.classId}
+                        {selectedSubject ? `Subject: ${selectedSubject}` : `Class ID: ${admission.classId}`}
                       </p>
+                      {assignedClass && (
+                        <p className="mt-2 text-sm text-[#dbeafe]">
+                          Assigned Class: {assignedClass}
+                        </p>
+                      )}
                     </section>
                   </div>
 
@@ -161,7 +256,7 @@ export default async function AdmissionVerifyPage({
                       </div>
 
                       <span className="rounded-full bg-amber-100 px-4 py-1 text-sm font-semibold text-amber-700">
-                        Pending Review
+                        {selectedSubject && !assignedClass ? "Needs Class Assignment" : "Pending Review"}
                       </span>
                     </div>
 
@@ -208,12 +303,23 @@ export default async function AdmissionVerifyPage({
 
                       <div className="rounded-2xl bg-slate-50 p-4">
                         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#1d4ed8]">
-                          Class ID
+                          {selectedSubject ? "Subject" : "Class ID"}
                         </p>
                         <p className="mt-2 text-base font-semibold text-[#0f172a]">
-                          {admission.classId}
+                          {selectedSubject ?? admission.classId}
                         </p>
                       </div>
+
+                      {selectedSubject && (
+                        <div className="rounded-2xl bg-slate-50 p-4">
+                          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#1d4ed8]">
+                            Assigned Class
+                          </p>
+                          <p className="mt-2 text-base font-semibold text-[#0f172a]">
+                            {assignedClass ?? "Awaiting registrar assignment"}
+                          </p>
+                        </div>
+                      )}
 
                       <div className="rounded-2xl bg-slate-50 p-4">
                         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#1d4ed8]">
@@ -236,6 +342,62 @@ export default async function AdmissionVerifyPage({
                           <p className="font-semibold">Ward already created.</p>
                           <p>Ward ID: {ward.id}</p>
                           <p>Pass Key: {ward.passKey}</p>
+                        </div>
+                      ) : selectedSubject ? (
+                        <div className="mt-3 space-y-4 text-sm text-[#0f172a]">
+                          <div className="space-y-2">
+                            <p className="font-semibold">
+                              {assignedClass ? "Class assigned." : "Ward creation is paused for this request."}
+                            </p>
+                            <p>
+                              {assignedClass
+                                ? "You can now create the ward for this student."
+                                : "Assign a class for this subject-based admission before creating the ward."}
+                            </p>
+                          </div>
+
+                          <form action={assignClassToAdmission} className="space-y-3">
+                            <input type="hidden" name="admissionId" value={admission.id} />
+                            <input type="hidden" name="subjectId" value={selectedSubjectId ?? ""} />
+                            <label className="block">
+                              <span className="text-xs font-semibold uppercase tracking-[0.18em] text-[#1d4ed8]">
+                                Class Assignment
+                              </span>
+                              <select
+                                name="classId"
+                                defaultValue={assignedClassId?.toString() ?? ""}
+                                required
+                                className="mt-2 w-full rounded-2xl border border-[#1e3c72]/20 bg-white px-4 py-3 text-sm text-[#0f172a] focus:border-[#2563eb] focus:outline-none"
+                              >
+                                <option value="" disabled>
+                                  Select a class
+                                </option>
+                                {classes.map((classItem) => (
+                                  <option key={classItem.id} value={classItem.id}>
+                                    {classLabels.get(classItem.id) ?? `Class #${classItem.id}`}
+                                  </option>
+                                ))}
+                              </select>
+                            </label>
+                            <button
+                              type="submit"
+                              className="inline-flex rounded-2xl border border-[#2563eb] bg-white px-6 py-3 font-bold text-[#2563eb] transition-colors hover:bg-[#eff6ff]"
+                            >
+                              {assignedClass ? "Update Class Assignment" : "Assign Class"}
+                            </button>
+                          </form>
+
+                          {assignedClass && (
+                            <form action={createWardFromAdmission}>
+                              <input type="hidden" name="admissionId" value={admission.id} />
+                              <button
+                                type="submit"
+                                className="inline-flex rounded-2xl bg-blue-600 px-8 py-3 font-bold text-white transition-colors hover:bg-blue-700"
+                              >
+                                Create Ward
+                              </button>
+                            </form>
+                          )}
                         </div>
                       ) : (
                         <div className="mt-3 space-y-4">

@@ -80,7 +80,7 @@ export default function WardForm({ user }: WardFormProps) {
           type="submit"
           className="inline-flex w-fit items-center justify-center rounded-full border border-[#0f2242] bg-[#0f2242] px-5 py-2 text-sm font-semibold text-white shadow-[0_6px_18px_rgba(15,34,66,0.28)] transition-all hover:-translate-y-0.5 hover:bg-[#1e3c72] active:translate-y-0"
         >
-          Fetch Ward
+          Add Ward
         </button>
       </form>
       {status === "error" && <p className="text-sm font-medium text-[#7f1d1d]">{error}</p>}
@@ -89,7 +89,8 @@ export default function WardForm({ user }: WardFormProps) {
           Ward added successfully.
         </p>
       )}
-      <p>If You Have Not Registered Your Child Yet, Get The <Link href={`./admissionForm`} className="text-[#7f1d1d]">Admission Form</Link> NOW!!</p>
+      <br /> 
+      <p className="font-semibold text-sm items-center justify-center px-1">If You Have Not Registered Your Child In Mundra Model Schools Yet, Get The <Link href={`./admissionForm`} className="text-[#7f1d1d]">Admission Form</Link></p>
     </main>
   );
 }

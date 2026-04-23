@@ -1,3 +1,4 @@
+import { decodeAdmissionAssignedClassId, decodeAdmissionSubjectId } from "@/lib/admission-subject";
 import prisma from "@/lib/prisma-client";
 import { Mail } from "@/lib/email";
 import { cookies } from "next/headers";
@@ -61,7 +62,12 @@ export async function POST(req: Request) {
         }
 
         name = admission.name.trim();
-        classId = Number.parseInt(admission.classId, 10);
+        const assignedClassId = decodeAdmissionAssignedClassId(admission.classId);
+
+        if (decodeAdmissionSubjectId(admission.classId) !== null && assignedClassId === null) {
+            return NextResponse.json({error: "This admission still needs a class assignment before a ward can be created"}, {status: 400});
+        }
+        classId = assignedClassId ?? Number.parseInt(admission.classId, 10);
         userId = admission.userId.trim();
         passKey = admission.id.split("-")[0]?.toUpperCase() ?? "WARDKEY";
     }
