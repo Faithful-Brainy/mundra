@@ -1,7 +1,5 @@
 "use client";
 
-import { UserScalarFieldEnum } from "@/app/generated/prisma/internal/prismaNamespace";
-import { encodeAdmissionSubjectId, formatSubjectName } from "@/lib/admission-subject";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
