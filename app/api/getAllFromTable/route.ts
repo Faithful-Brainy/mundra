@@ -7,7 +7,7 @@ export async function POST(req: Request) {
 
     const tableName = payload.tableName;
 
-    const data = await prisma.$queryRaw`SELECT * FROM ${Prisma.raw(tableName)}`
+    const data = await prisma.$queryRaw`SELECT * FROM '${Prisma.raw(tableName)}'`
 
     return NextResponse.json(data);
 }
