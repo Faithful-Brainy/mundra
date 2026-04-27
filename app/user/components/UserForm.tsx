@@ -62,6 +62,7 @@ export default function UserForm({ user }: UserFormProps) {
 
   async function handleSubmit(e: React.SubmitEvent) {
     e.preventDefault();
+    setLoading(false);
 
     const res = await fetch("/api/controllers/updateUser", {
       method: "POST",
@@ -82,6 +83,7 @@ export default function UserForm({ user }: UserFormProps) {
       return;
     }
 
+    setLoading(false);
     setStatus("success");
     window.location.reload();
   }
