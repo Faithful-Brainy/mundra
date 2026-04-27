@@ -41,7 +41,7 @@ export default function AdmissionForm() {
       setUserId(data.user.id);
     }
 
-    async function loadSubjects() {
+    async function loadClasses() {
       const res = await fetch("/api/getAllFromTable", {
         method: "POST",
         headers: {
@@ -60,7 +60,7 @@ export default function AdmissionForm() {
     }
 
     loadCurrentUser();
-    loadSubjects();
+    loadClasses();
   }, []);
 
   async function handleSubmit(e: React.SubmitEvent) {

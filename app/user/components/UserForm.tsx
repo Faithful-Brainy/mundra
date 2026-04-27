@@ -108,17 +108,6 @@ export default function UserForm({ user }: UserFormProps) {
           className="rounded border border-[#1e3c72]/40 bg-[#eaf8ff] px-4 py-2 text-[#0b1324] placeholder:text-[#1e3c72]/70 focus:border-[#1e3c72] focus:outline-none"
           onChange={(e) => setPassword(e.target.value)}
         />
-        <select
-          className="rounded border border-[#1e3c72]/40 bg-[#eaf8ff] px-4 py-2 text-[#0b1324] focus:border-[#1e3c72] focus:outline-none"
-          value={role}
-          onChange={(e) => setRole(e.target.value as EditableUser["role"])}
-        >
-          {roleOptions.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
         <button
           type="submit"
           className="inline-flex w-fit items-center justify-center rounded-full border border-[#0f2242] bg-[#0f2242] px-5 py-2 text-sm font-semibold text-white shadow-[0_6px_18px_rgba(15,34,66,0.28)] transition-all hover:-translate-y-0.5 hover:bg-[#1e3c72] active:translate-y-0"

@@ -28,3 +28,17 @@ const cookieStore = await cookies();
   }
 
   -u
+
+
+------------------------------------
+<select
+          className="rounded border border-[#1e3c72]/40 bg-[#eaf8ff] px-4 py-2 text-[#0b1324] focus:border-[#1e3c72] focus:outline-none"
+          value={role}
+          onChange={(e) => setRole(e.target.value as EditableUser["role"])}
+        >
+          {roleOptions.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
