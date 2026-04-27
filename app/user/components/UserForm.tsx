@@ -37,6 +37,7 @@ type UserFormProps = {
 
 export default function UserForm({ user }: UserFormProps) {
   const [name, setName] = useState(user.name ?? "");
+  const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState(user.email);
   const [password, setPassword] = useState(user.password ?? "");
   const [role, setRole] = useState(user.role);
@@ -103,10 +104,14 @@ export default function UserForm({ user }: UserFormProps) {
         />
         <button
           type="submit"
+          disabled={loading}
           className="inline-flex w-fit items-center justify-center rounded-full border border-[#0f2242] bg-[#0f2242] px-5 py-2 text-sm font-semibold text-white shadow-[0_6px_18px_rgba(15,34,66,0.28)] transition-all hover:-translate-y-0.5 hover:bg-[#1e3c72] active:translate-y-0"
         >
-          Submit
+          { loading ? "Submitting..." : "Submit" }
         </button>
+        <br />
+
+        <p className="font-bold text-sm">If You Wish To Change Your Email or Other Status, Contact Us With The Feedback Feature</p>
 
         {status === "success" && (
           <p className="text-sm font-medium text-[#14532d]">
