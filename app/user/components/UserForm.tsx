@@ -97,13 +97,6 @@ export default function UserForm({ user }: UserFormProps) {
         />
         <input
           type="text"
-          placeholder="Change Email"
-          className="rounded border border-[#1e3c72]/40 bg-[#eaf8ff] px-4 py-2 text-[#0b1324] placeholder:text-[#1e3c72]/70 focus:border-[#1e3c72] focus:outline-none"
-          onChange={(e) => setEmail(e.target.value)}
-          value={email}
-        />
-        <input
-          type="text"
           placeholder="Change Password"
           className="rounded border border-[#1e3c72]/40 bg-[#eaf8ff] px-4 py-2 text-[#0b1324] placeholder:text-[#1e3c72]/70 focus:border-[#1e3c72] focus:outline-none"
           onChange={(e) => setPassword(e.target.value)}
