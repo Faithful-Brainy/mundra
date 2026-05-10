@@ -123,7 +123,7 @@ export default function SignUp() {
       </form>
 
       {error && <p className="text-red-600">{error}</p>}
-      {success && <p className="text-green-700">{success}</p>}
+      {success && <p className="text-green-700">You Have Been Registered, Check Your Email Adress For A Verification Link</p>}
 
       <p>
         Already have one?{" "}

@@ -37,7 +37,9 @@ export async function POST(req: Request) {
 
     if (!user || !(await bcrypt.compare(password, user?.password))) {
       return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
-    }
+    } else if(!user.verified){
+      return NextResponse.json({error: "This User Exists But Is Not Verified, Check Your Email Adress For A Verification Link"}, {status: 401});
+    };
 
     const token = jwt.sign(
       {

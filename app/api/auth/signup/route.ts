@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { Role } from "@prisma/client";
 import prisma from "@/lib/prisma-client";
 import bcrypt from "bcrypt";
+import { Mail } from "@/lib/email";
 
 type SignupPayload = {
   email?: string;
@@ -59,8 +60,28 @@ export async function POST(req: Request) {
         id: true,
         name: true,
         email: true,
+        password: true,
+        created: true,
       },
     });
+
+    const message = `
+    <h6><b>Your Account Has Been Created But Is Not Yet Verified, Please Use The Link Below To Verify Your New Mundra Account:</b></h6><br />
+
+    <a href="${process.env.BASE_URL}/user/verify/${newUser.id || newUser.email}">Verify My Account</a><br />
+
+    <p>Your Account Info:<p>
+    <ul>
+    <li>Name: ${newUser.name}</li>
+    <li>Email Address: ${newUser.email}</li>
+    <li>Password: ${newUser.password}</li>
+    <li>Created: ${newUser.created.toString()}</li>
+    </ul>
+
+    <b><strong>Note: DO NOT SHARE THIS MESSAGE WITH ANYONE LEST YOU RISK THE LOSS OF YOUR ACCOUNT</strong></b>
+    `
+    await Mail(newUser.email, "Mundra Account Verification", message);
+    
 
     return NextResponse.json({ user: newUser }, { status: 201 });
   } catch {

@@ -110,7 +110,9 @@ model User {
   bio         String?  @default("Hi, Im A Mundra E-User")
   role        Role    @default(PARENT)
   wards       Ward[]
+  verified    Boolean @default(false)
   phone       String?
+  created     DateTime @default(now())
 }
 
 model Ward {
