@@ -38,7 +38,7 @@ export default function Header() {
     { href: "/wards", label: !["STUDENT"].includes(user?.role!) ? "Admissions" : "" },
     { href: "/settings", label: "Settings" },
     { href: "/news", label: "News" },
-    { href: "/admin", label: !["PARENT","STUDENT"].includes(user?.role!) ? "Admin" : "" },
+    { href: "/admin", label: !["PARENT","STUDENT"].includes(user?.role!) || !isLoggedIn ? "Admin" : "" },
   ];
 
   return (
